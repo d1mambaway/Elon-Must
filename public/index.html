@@ -23,6 +23,8 @@
         .message.user .message-content { background: rgba(180, 30, 30, 0.4); color: #F0F0F0; border: 1px solid rgba(180, 30, 30, 0.5); border-bottom-right-radius: 4px; }
         .message.ai .message-content { background: rgba(255, 255, 255, 0.07); color: #D0D0D0; border: 1px solid rgba(255, 255, 255, 0.1); border-bottom-left-radius: 4px; }
         .typing-indicator { display: flex; gap: 10px; align-items: center; padding: 12px 16px; background: rgba(255, 255, 255, 0.07); border-radius: 14px; border-bottom-left-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.1); width: fit-content; }
+        .typing-indicator img { width: 40px; height: 40px; border-radius: 50%; }
+        .typing-indicator span { color: #888; font-style: italic; font-size: 14px; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .input-section { display: flex; gap: 8px; padding: 12px 16px; background: rgba(15, 15, 20, 0.95); border-top: 1px solid rgba(180, 30, 30, 0.2); }
         input { flex: 1; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(180, 30, 30, 0.3); border-radius: 20px; padding: 10px 16px; font-size: 14px; outline: none; color: #E0E0E0; }
@@ -32,17 +34,20 @@
         button:hover { background: linear-gradient(135deg, #DC2626, #991B1B); box-shadow: 0 0 12px rgba(255, 30, 30, 0.4); }
         button:disabled { background: #333; color: #666; cursor: not-allowed; box-shadow: none; }
         .error { background: rgba(180, 30, 30, 0.2); color: #FF6060; padding: 8px 12px; border-radius: 8px; font-size: 12px; margin: 4px 16px; border: 1px solid rgba(180, 30, 30, 0.3); }
-        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: rgba(255, 60, 60, 0.6); text-align: center; padding: 32px; }
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; padding: 32px; }
         .empty-state img { width: 120px; height: 120px; border-radius: 50%; margin-bottom: 20px; box-shadow: 0 0 25px rgba(255, 40, 40, 0.4); }
         .empty-state p { font-size: 20px; color: #ff4040; font-weight: 600; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header"><div class="header-icon"></div># Альтрон</div>
+        <div class="header">
+            <div class="header-icon"></div>
+            <h1>Альтрон</h1>
+        </div>
         <div class="chat-box" id="chatBox">
             <div class="empty-state" id="emptyState">
-                ![Альтрон](/avatar.gif)
+                <img src="/avatar.gif" alt="Альтрон">
                 <p>С чем пожаловал?</p>
             </div>
         </div>
@@ -74,7 +79,7 @@
             sendBtn.disabled = true;
             const typingDiv = document.createElement('div');
             typingDiv.className = 'message ai';
-            typingDiv.innerHTML = '<div class="typing-indicator">![думаю...](/thinking.gif)<span style="color:#888;font-style:italic;">Альтрон думает...</span></div>';
+            typingDiv.innerHTML = '<div class="typing-indicator"><img src="/thinking.gif" alt="думаю..."><span>Альтрон думает...</span></div>';
             chatBox.appendChild(typingDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
             try {
