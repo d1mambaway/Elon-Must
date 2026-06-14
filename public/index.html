@@ -55,37 +55,19 @@
     </div>
 
     <script>
-        let GEMINI_API_KEY = null;
+        // ВСТАВЬ СВОЙ НОВЫЙ API КЛЮЧ СЮДА
+        const GEMINI_API_KEY = 'AIzaSyD...';
+
         const tg = window.Telegram.WebApp;
         tg.expand();
-        
+
         const chatBox = document.getElementById('chatBox');
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
         const errorBox = document.getElementById('errorBox');
         let isFirstMessage = true;
 
-        // Загрузи API ключ с сервера при старте
-        async function loadApiKey() {
-            try {
-                const response = await fetch('/api/getKey');
-                const data = await response.json();
-                GEMINI_API_KEY = data.key;
-                if (!GEMINI_API_KEY) {
-                    showError('API ключ не настроен на сервере');
-                }
-            } catch (error) {
-                showError('Ошибка загрузки API ключа: ' + error.message);
-                console.error('Failed to load API key:', error);
-            }
-        }
-
         async function sendMessage() {
-            if (!GEMINI_API_KEY) {
-                showError('API ключ не загружен. Перезагрузи страницу.');
-                return;
-            }
-
             const text = messageInput.value.trim();
             if (!text) return;
 
@@ -120,7 +102,7 @@
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(`API Error ${response.status}: ${errorData.error?.message || 'Unknown error'}`);
+                    throw new Error(`API Error ${response.status}: ${errorData.error?.message || 'Unknown'}`);
                 }
 
                 const data = await response.json();
@@ -132,7 +114,7 @@
             } catch (error) {
                 typingDiv.remove();
                 showError('Ошибка: ' + error.message);
-                console.error('Chat error:', error);
+                console.error('Error:', error);
             } finally {
                 sendBtn.disabled = false;
                 messageInput.focus();
@@ -156,7 +138,6 @@
             setTimeout(() => error.remove(), 5000);
         }
 
-        // Event listeners
         sendBtn.addEventListener('click', sendMessage);
         messageInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -165,8 +146,7 @@
             }
         });
 
-        // Загрузи ключ при старте
-        loadApiKey();
+        messageInput.focus();
     </script>
 </body>
 </html>
