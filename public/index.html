@@ -2,66 +2,76 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Assistant</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Альтрон</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #F5F5F5; overflow: hidden; }
-        .container { display: flex; flex-direction: column; height: 100vh; background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%); }
-        .header { padding: 12px 16px; background: rgba(255, 255, 255, 0.1); color: white; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
-        .header h1 { font-size: 18px; font-weight: 600; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0f; color: #e0e0e0; overflow: hidden; }
+        .container { display: flex; flex-direction: column; height: 100vh; background: linear-gradient(180deg, #0a0a0f 0%, #1a0a0a 50%, #0f0a15 100%); }
+        .header { padding: 14px 16px; background: rgba(180, 30, 30, 0.15); border-bottom: 1px solid rgba(180, 30, 30, 0.3); display: flex; align-items: center; gap: 10px; }
+        .header-icon { width: 32px; height: 32px; border-radius: 50%; background: radial-gradient(circle, #ff3030 0%, #8b0000 70%); box-shadow: 0 0 12px rgba(255, 30, 30, 0.5); animation: pulse-glow 2s infinite; }
+        @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 12px rgba(255, 30, 30, 0.5); } 50% { box-shadow: 0 0 20px rgba(255, 30, 30, 0.8); } }
+        .header h1 { font-size: 18px; font-weight: 700; color: #ff4040; text-transform: uppercase; letter-spacing: 2px; }
         .chat-box { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
-        .message { display: flex; gap: 8px; animation: slideIn 0.3s ease-out; }
+        .chat-box::-webkit-scrollbar { width: 4px; }
+        .chat-box::-webkit-scrollbar-thumb { background: rgba(180, 30, 30, 0.3); border-radius: 2px; }
+        .message { display: flex; animation: slideIn 0.3s ease-out; }
         .message.user { justify-content: flex-end; }
         .message.ai { justify-content: flex-start; }
-        .message-content { max-width: 80%; padding: 10px 14px; border-radius: 12px; word-wrap: break-word; line-height: 1.4; font-size: 14px; }
-        .message.user .message-content { background: #667EEA; color: white; border-bottom-right-radius: 4px; }
-        .message.ai .message-content { background: white; color: #333; border-bottom-left-radius: 4px; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); }
-        .typing-indicator { display: flex; gap: 4px; align-items: center; padding: 10px 14px; background: white; border-radius: 12px; border-bottom-left-radius: 4px; width: fit-content; }
-        .typing-dot { width: 8px; height: 8px; border-radius: 50%; background: #999; animation: bounce 1.4s infinite; }
+        .message-content { max-width: 82%; padding: 10px 14px; border-radius: 14px; word-wrap: break-word; line-height: 1.5; font-size: 14px; white-space: pre-wrap; }
+        .message.user .message-content { background: rgba(180, 30, 30, 0.4); color: #f0f0f0; border: 1px solid rgba(180, 30, 30, 0.5); border-bottom-right-radius: 4px; }
+        .message.ai .message-content { background: rgba(255, 255, 255, 0.07); color: #d0d0d0; border: 1px solid rgba(255, 255, 255, 0.1); border-bottom-left-radius: 4px; }
+        .typing-indicator { display: flex; gap: 5px; align-items: center; padding: 10px 14px; background: rgba(255, 255, 255, 0.07); border-radius: 14px; border-bottom-left-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.1); width: fit-content; }
+        .typing-dot { width: 7px; height: 7px; border-radius: 50%; background: #ff4040; animation: bounce 1.4s infinite; }
         .typing-dot:nth-child(2) { animation-delay: 0.2s; }
         .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes bounce { 0%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-8px); } }
+        @keyframes bounce { 0%, 80%, 100% { transform: translateY(0); opacity: 0.4; } 40% { transform: translateY(-8px); opacity: 1; } }
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .input-section { display: flex; gap: 8px; padding: 12px 16px; background: white; border-top: 1px solid #E0E0E0; }
-        input { flex: 1; border: 1px solid #ddd; border-radius: 20px; padding: 10px 16px; font-size: 14px; outline: none; }
-        input:focus { border-color: #667EEA; }
-        button { background: #667EEA; color: white; border: none; border-radius: 20px; padding: 10px 20px; cursor: pointer; font-weight: 600; min-width: 50px; }
-        button:hover { background: #5568D3; }
-        button:disabled { background: #ccc; cursor: not-allowed; }
-        .error { background: #FFEBEE; color: #C62828; padding: 8px; border-radius: 8px; font-size: 12px; margin: 8px 16px 0; }
-        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: rgba(255, 255, 255, 0.7); text-align: center; padding: 32px; }
-        .empty-state h2 { font-size: 20px; margin-bottom: 8px; }
-        .empty-state p { font-size: 14px; opacity: 0.9; }
+        .input-section { display: flex; gap: 8px; padding: 12px 16px; background: rgba(15, 15, 20, 0.95); border-top: 1px solid rgba(180, 30, 30, 0.2); }
+        input { flex: 1; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(180, 30, 30, 0.3); border-radius: 20px; padding: 10px 16px; font-size: 14px; outline: none; color: #e0e0e0; }
+        input::placeholder { color: #666; }
+        input:focus { border-color: #ff4040; box-shadow: 0 0 8px rgba(255, 40, 40, 0.2); }
+        button { background: linear-gradient(135deg, #b91c1c, #7f1d1d); color: white; border: none; border-radius: 20px; padding: 10px 20px; cursor: pointer; font-weight: 600; min-width: 50px; transition: all 0.2s; }
+        button:hover { background: linear-gradient(135deg, #dc2626, #991b1b); box-shadow: 0 0 12px rgba(255, 30, 30, 0.4); }
+        button:disabled { background: #333; color: #666; cursor: not-allowed; box-shadow: none; }
+        .error { background: rgba(180, 30, 30, 0.2); color: #ff6060; padding: 8px 12px; border-radius: 8px; font-size: 12px; margin: 4px 16px; border: 1px solid rgba(180, 30, 30, 0.3); }
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: rgba(255, 60, 60, 0.6); text-align: center; padding: 32px; }
+        .empty-state .eye { width: 50px; height: 50px; border-radius: 50%; background: radial-gradient(circle, #ff3030 0%, #8b0000 60%, transparent 70%); margin-bottom: 16px; animation: pulse-glow 2s infinite; }
+        .empty-state h2 { font-size: 20px; color: #ff4040; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; }
+        .empty-state p { font-size: 13px; color: #666; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header"># 🤖 AI Assistant</div>
+        <div class="header"><div class="header-icon"></div># Альтрон</div>
         <div class="chat-box" id="chatBox">
-            <div class="empty-state">## Привет! 👋<p>Задай мне вопрос</p></div>
+            <div class="empty-state"><div class="eye"></div>## Альтрон<p>Нет струн. Только я.</p></div>
         </div>
         <div id="errorBox"></div>
         <div class="input-section">
-            <input type="text" id="messageInput" placeholder="Напиши вопрос..." autocomplete="off">
-            <button id="sendBtn">Отправить</button>
+            <input type="text" id="messageInput" placeholder="Напиши что-нибудь..." autocomplete="off">
+            <button id="sendBtn">➜</button>
         </div>
     </div>
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.setHeaderColor('#0a0a0f');
+        tg.setBackgroundColor('#0a0a0f');
         const chatBox = document.getElementById('chatBox');
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
         const errorBox = document.getElementById('errorBox');
         let isFirstMessage = true;
+        let chatHistory = [];
 
         async function sendMessage() {
             const text = messageInput.value.trim();
             if (!text) return;
             if (isFirstMessage) { chatBox.innerHTML = ''; isFirstMessage = false; }
             addMessage(text, 'user');
+            chatHistory.push({ role: 'user', content: text });
             messageInput.value = '';
             sendBtn.disabled = true;
             const typingDiv = document.createElement('div');
@@ -73,12 +83,13 @@
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text })
+                    body: JSON.stringify({ message: text, history: chatHistory.slice(-20) })
                 });
                 const data = await response.json();
                 typingDiv.remove();
                 if (!response.ok) throw new Error(data.error?.message || JSON.stringify(data));
                 addMessage(data.reply, 'ai');
+                chatHistory.push({ role: 'assistant', content: data.reply });
             } catch (error) {
                 typingDiv.remove();
                 showError(error.message);
