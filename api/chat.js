@@ -8,22 +8,28 @@ module.exports = async function handler(req, res) {
   const { message } = req.body;
   if (!message) return res.status(400).json({ error: 'No message' });
 
-  const key = process.env.GEMINI_API_KEY;
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${key}`;
+  const key = process.env.GROQ_API_KEY;
 
   try {
-    const response = await fetch(url, {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text: message }] }] })
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + key
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'user', content: message }],
+        max_tokens: 1024
+      })
     });
     const data = await response.json();
-    console.log('Gemini status:', response.status, JSON.stringify(data));
+    console.log('Groq status:', response.status, JSON.stringify(data));
     if (!response.ok) return res.status(response.status).json(data);
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response';
+    const reply = data.choices?.[0]?.message?.content || 'No response';
     res.json({ reply });
   } catch (err) {
-    console.error('Gemini error:', err);
+    console.error('Groq error:', err);
     res.status(500).json({ error: err.message });
   }
 };
