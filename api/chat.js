@@ -17,7 +17,8 @@ module.exports = async function handler(req, res) {
   const { message, history } = req.body;
   if (!message) return res.status(400).json({ error: 'No message' });
 
-  const key = process.env.GROQ_API_KEY;
+  const groqKey = process.env.GROQ_API_KEY;
+  const hfKey = process.env.HF_API_KEY;
 
   const messages = [{ role: 'system', content: SYSTEM_PROMPT }];
   if (history && Array.isArray(history)) {
@@ -30,7 +31,7 @@ module.exports = async function handler(req, res) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + key
+        'Authorization': 'Bearer ' + groqKey
       },
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
@@ -52,10 +53,34 @@ module.exports = async function handler(req, res) {
     const imgMatch = reply.match(/\[IMG:\s*(.+?)\]/);
     if (imgMatch) {
       const imgPrompt = imgMatch[1].trim();
-      const encodedPrompt = encodeURIComponent(imgPrompt);
-      const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}`;
       const textReply = reply.replace(/\[IMG:\s*.+?\]/, '').trim();
-      return res.json({ reply: textReply, image: imageUrl });
+
+      // Generate image via HuggingFace Inference API (free)
+      try {
+        const hfResponse = await fetch(
+          'https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell',
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': 'Bearer ' + hfKey,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ inputs: imgPrompt })
+          }
+        );
+
+        if (hfResponse.ok) {
+          const buffer = await hfResponse.arrayBuffer();
+          const base64 = Buffer.from(buffer).toString('base64');
+          const dataUrl = 'data:image/jpeg;base64,' + base64;
+          return res.json({ reply: textReply, image: dataUrl });
+        } else {
+          // Image gen failed, return text only
+          return res.json({ reply: textReply + '\n\n⚠️ Картинку сгенерировать не удалось.' });
+        }
+      } catch (imgErr) {
+        return res.json({ reply: textReply + '\n\n⚠️ Картинку сгенерировать не удалось.' });
+      }
     }
 
     res.json({ reply });
