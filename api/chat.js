@@ -53,7 +53,7 @@ module.exports = async function handler(req, res) {
     if (imgMatch) {
       const imgPrompt = imgMatch[1].trim();
       const encodedPrompt = encodeURIComponent(imgPrompt);
-      const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=512&height=512&nologo=true&seed=${Date.now()}`;
+      const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}`;
       const textReply = reply.replace(/\[IMG:\s*.+?\]/, '').trim();
       return res.json({ reply: textReply, image: imageUrl });
     }
