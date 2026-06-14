@@ -6,203 +6,34 @@
     <title>AI Assistant</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f5f5;
-            overflow: hidden;
-        }
-
-        .container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .header {
-            padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .header h1 {
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .chat-box {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .message {
-            display: flex;
-            gap: 8px;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        .message.user {
-            justify-content: flex-end;
-        }
-
-        .message.ai {
-            justify-content: flex-start;
-        }
-
-        .message-content {
-            max-width: 80%;
-            padding: 10px 14px;
-            border-radius: 12px;
-            word-wrap: break-word;
-            line-height: 1.4;
-            font-size: 14px;
-        }
-
-        .message.user .message-content {
-            background: #667eea;
-            color: white;
-            border-bottom-right-radius: 4px;
-        }
-
-        .message.ai .message-content {
-            background: white;
-            color: #333;
-            border-bottom-left-radius: 4px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-        }
-
-        .typing-indicator {
-            display: flex;
-            gap: 4px;
-            align-items: center;
-            padding: 10px 14px;
-            background: white;
-            border-radius: 12px;
-            border-bottom-left-radius: 4px;
-            width: fit-content;
-        }
-
-        .typing-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #999;
-            animation: bounce 1.4s infinite;
-        }
-
-        .typing-dot:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .typing-dot:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes bounce {
-            0%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-8px); }
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .input-section {
-            display: flex;
-            gap: 8px;
-            padding: 12px 16px;
-            background: white;
-            border-top: 1px solid #e0e0e0;
-        }
-
-        input {
-            flex: 1;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            padding: 10px 16px;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        input:focus {
-            border-color: #667eea;
-        }
-
-        button {
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            padding: 10px 20px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background 0.2s;
-            min-width: 50px;
-        }
-
-        button:hover {
-            background: #5568d3;
-        }
-
-        button:active {
-            transform: scale(0.95);
-        }
-
-        button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .error {
-            background: #ffebee;
-            color: #c62828;
-            padding: 8px;
-            border-radius: 8px;
-            font-size: 12px;
-            margin: 8px 16px 0;
-        }
-
-        .empty-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: rgba(255, 255, 255, 0.7);
-            text-align: center;
-            padding: 32px;
-        }
-
-        .empty-state h2 {
-            font-size: 20px;
-            margin-bottom: 8px;
-        }
-
-        .empty-state p {
-            font-size: 14px;
-            opacity: 0.9;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; overflow: hidden; }
+        .container { display: flex; flex-direction: column; height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .header { padding: 12px 16px; background: rgba(255, 255, 255, 0.1); color: white; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
+        .header h1 { font-size: 18px; font-weight: 600; }
+        .chat-box { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+        .message { display: flex; gap: 8px; animation: slideIn 0.3s ease-out; }
+        .message.user { justify-content: flex-end; }
+        .message.ai { justify-content: flex-start; }
+        .message-content { max-width: 80%; padding: 10px 14px; border-radius: 12px; word-wrap: break-word; line-height: 1.4; font-size: 14px; }
+        .message.user .message-content { background: #667eea; color: white; border-bottom-right-radius: 4px; }
+        .message.ai .message-content { background: white; color: #333; border-bottom-left-radius: 4px; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); }
+        .typing-indicator { display: flex; gap: 4px; align-items: center; padding: 10px 14px; background: white; border-radius: 12px; border-bottom-left-radius: 4px; width: fit-content; }
+        .typing-dot { width: 8px; height: 8px; border-radius: 50%; background: #999; animation: bounce 1.4s infinite; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-8px); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .input-section { display: flex; gap: 8px; padding: 12px 16px; background: white; border-top: 1px solid #e0e0e0; }
+        input { flex: 1; border: 1px solid #ddd; border-radius: 20px; padding: 10px 16px; font-size: 14px; outline: none; }
+        input:focus { border-color: #667eea; }
+        button { background: #667eea; color: white; border: none; border-radius: 20px; padding: 10px 20px; cursor: pointer; font-weight: 600; min-width: 50px; }
+        button:hover { background: #5568d3; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .error { background: #ffebee; color: #c62828; padding: 8px; border-radius: 8px; font-size: 12px; margin: 8px 16px 0; }
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: rgba(255, 255, 255, 0.7); text-align: center; padding: 32px; }
+        .empty-state h2 { font-size: 20px; margin-bottom: 8px; }
+        .empty-state p { font-size: 14px; opacity: 0.9; }
     </style>
 </head>
 <body>
@@ -210,42 +41,51 @@
         <div class="header">
             <h1>🤖 AI Assistant</h1>
         </div>
-        
         <div class="chat-box" id="chatBox">
             <div class="empty-state">
                 <h2>Привет! 👋</h2>
                 <p>Задай мне вопрос</p>
             </div>
         </div>
-
         <div id="errorBox"></div>
-
         <div class="input-section">
-            <input 
-                type="text" 
-                id="messageInput" 
-                placeholder="Напиши вопрос..." 
-                autocomplete="off"
-            >
+            <input type="text" id="messageInput" placeholder="Напиши вопрос..." autocomplete="off">
             <button id="sendBtn">Отправить</button>
         </div>
     </div>
 
     <script>
-        // ВАЖНО! Замени ЗДЕСЬ на свой API ключ с https://aistudio.google.com/apikey
-        const GEMINI_API_KEY = AQ.Ab8RN6LT959VsfnU15NgBBufy_mk3THRoBPu_H1ouJUAF6IUWg; // ← ВСТАВЬ СВОЙ КЛЮЧ СЮДА
-
+        let GEMINI_API_KEY = null;
         const tg = window.Telegram.WebApp;
         tg.expand();
-
+        
         const chatBox = document.getElementById('chatBox');
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
         const errorBox = document.getElementById('errorBox');
-
         let isFirstMessage = true;
 
+        // Загрузи API ключ с сервера при старте
+        async function loadApiKey() {
+            try {
+                const response = await fetch('/api/getKey');
+                const data = await response.json();
+                GEMINI_API_KEY = data.key;
+                if (!GEMINI_API_KEY) {
+                    showError('API ключ не настроен на сервере');
+                }
+            } catch (error) {
+                showError('Ошибка загрузки API ключа: ' + error.message);
+                console.error('Failed to load API key:', error);
+            }
+        }
+
         async function sendMessage() {
+            if (!GEMINI_API_KEY) {
+                showError('API ключ не загружен. Перезагрузи страницу.');
+                return;
+            }
+
             const text = messageInput.value.trim();
             if (!text) return;
 
@@ -260,13 +100,7 @@
 
             const typingDiv = document.createElement('div');
             typingDiv.className = 'message ai';
-            typingDiv.innerHTML = `
-                <div class="typing-indicator">
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                </div>
-            `;
+            typingDiv.innerHTML = '<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
             chatBox.appendChild(typingDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
 
@@ -275,14 +109,10 @@
                     `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
                     {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             contents: [{
-                                parts: [{
-                                    text: text
-                                }]
+                                parts: [{ text: text }]
                             }]
                         })
                     }
@@ -301,8 +131,8 @@
 
             } catch (error) {
                 typingDiv.remove();
-                console.error('Error:', error);
-                showError(`Ошибка: ${error.message}`);
+                showError('Ошибка: ' + error.message);
+                console.error('Chat error:', error);
             } finally {
                 sendBtn.disabled = false;
                 messageInput.focus();
@@ -311,8 +141,9 @@
 
         function addMessage(text, sender) {
             const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}`;
-            messageDiv.innerHTML = `<div class="message-content">${escapeHtml(text)}</div>`;
+            messageDiv.className = 'message ' + sender;
+            const escaped = text.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+            messageDiv.innerHTML = '<div class="message-content">' + escaped + '</div>';
             chatBox.appendChild(messageDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
@@ -325,12 +156,7 @@
             setTimeout(() => error.remove(), 5000);
         }
 
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
+        // Event listeners
         sendBtn.addEventListener('click', sendMessage);
         messageInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -339,7 +165,8 @@
             }
         });
 
-        messageInput.focus();
+        // Загрузи ключ при старте
+        loadApiKey();
     </script>
 </body>
 </html>
